@@ -13,6 +13,7 @@ app.innerHTML = `
 <div class="notes"><span>THE ART OF HIDING IN PLAIN SIGHT</span><p>Your picture looks the same. Its story is different.</p></div></main><footer><span class="credit">Designed and developed by <strong>Mr. Suleman Omar</strong></span><span>Keep the PNG original. Resizing or compression may erase your message.</span></footer>`;
 const $ = id => document.getElementById(id);
 let mode='hide', cover=null, busy=false, url=null;
+const passwords = { hide: '', reveal: '' };
 const pictures = { hide: { cover: null, previewUrl: null, info: '', revision: 0 }, reveal: { cover: null, previewUrl: null, info: '', revision: 0 } };
 function renderPicture(){
   const picture = pictures[mode];
@@ -28,7 +29,12 @@ function renderPicture(){
 function clearResult(){ $('result').hidden=true; $('status').textContent=''; $('revealed').value=''; if(url){URL.revokeObjectURL(url);url=null;} }
 function count(){ $('count').textContent=`${new TextEncoder().encode($('message').value).length.toLocaleString()} bytes`; }
 function setMode(next){
-  if(busy)return; mode=next; clearResult(); renderPicture();
+  if(busy || next===mode)return;
+  passwords[mode]=$('password').value;
+  mode=next; clearResult(); renderPicture();
+  $('password').value=passwords[mode];
+  $('password').type='password';
+  $('toggle-password').textContent='Show';
   $('hide-tab').setAttribute('aria-selected',String(mode==='hide')); $('reveal-tab').setAttribute('aria-selected',String(mode==='reveal'));
   $('message').hidden=mode==='reveal'; $('count').hidden=mode==='reveal'; $('step-two').textContent=mode==='hide'?'02 / YOUR MESSAGE':'02 / UNLOCK THE MESSAGE';
   $('submit').innerHTML=mode==='hide'?'Encrypt & hide <span>↗</span>':'Decrypt & reveal <span>↙</span>';
@@ -37,7 +43,7 @@ function setMode(next){
   $('password-help').textContent=mode==='hide'?'This password unlocks the message. Share it separately.':'Enter the password used to hide the message.';
 }
 $('hide-tab').onclick=()=>setMode('hide'); $('reveal-tab').onclick=()=>setMode('reveal');
-$('message').oninput=()=>{count();clearResult();}; $('password').oninput=clearResult;
+$('message').oninput=()=>{count();clearResult();}; $('password').oninput=()=>{passwords[mode]=$('password').value;clearResult();};
 $('toggle-password').onclick=()=>{const visible=$('password').type==='password';$('password').type=visible?'text':'password';$('toggle-password').textContent=visible?'Hide':'Show';};
 async function load(file){
   if(busy||!file)return; clearResult();
