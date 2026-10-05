@@ -12,11 +12,22 @@ app.innerHTML = `
 </form><div class="card-footer"><span>⌁ &nbsp; AES-256-GCM encryption</span><span>⌂ &nbsp; 100% in your browser</span><span>◎ &nbsp; No uploads. No accounts.</span></div></section>
 <div class="notes"><span>THE ART OF HIDING IN PLAIN SIGHT</span><p>Your picture looks the same. Its story is different.</p></div></main><footer><span class="credit">Designed and developed by <strong>Mr. Suleman Omar</strong></span><span>Keep the PNG original. Resizing or compression may erase your message.</span></footer>`;
 const $ = id => document.getElementById(id);
-let mode='hide', cover=null, busy=false, url=null, previewUrl=null;
+let mode='hide', cover=null, busy=false, url=null;
+const pictures = { hide: { cover: null, previewUrl: null, info: '', revision: 0 }, reveal: { cover: null, previewUrl: null, info: '', revision: 0 } };
+function renderPicture(){
+  const picture = pictures[mode];
+  cover = picture.cover;
+  $('file').value = '';
+  $('preview').hidden = !cover;
+  $('upload-content').hidden = !!cover;
+  if (picture.previewUrl) $('preview').src = picture.previewUrl;
+  else $('preview').removeAttribute('src');
+  $('image-info').textContent = picture.info || 'Your image stays on your device.';
+}
 function clearResult(){ $('result').hidden=true; $('status').textContent=''; $('revealed').value=''; if(url){URL.revokeObjectURL(url);url=null;} }
 function count(){ $('count').textContent=`${new TextEncoder().encode($('message').value).length.toLocaleString()} bytes`; }
 function setMode(next){
-  if(busy)return; mode=next; clearResult();
+  if(busy)return; mode=next; clearResult(); renderPicture();
   $('hide-tab').setAttribute('aria-selected',String(mode==='hide')); $('reveal-tab').setAttribute('aria-selected',String(mode==='reveal'));
   $('message').hidden=mode==='reveal'; $('count').hidden=mode==='reveal'; $('step-two').textContent=mode==='hide'?'02 / YOUR MESSAGE':'02 / UNLOCK THE MESSAGE';
   $('submit').innerHTML=mode==='hide'?'Encrypt & hide <span>↗</span>':'Decrypt & reveal <span>↙</span>';
@@ -29,20 +40,31 @@ $('message').oninput=()=>{count();clearResult();}; $('password').oninput=clearRe
 $('toggle-password').onclick=()=>{const visible=$('password').type==='password';$('password').type=visible?'text':'password';$('toggle-password').textContent=visible?'Hide':'Show';};
 async function load(file){
   if(busy||!file)return; clearResult();
+  const targetMode = mode;
+  const picture = pictures[targetMode];
+  const revision = ++picture.revision;
   try{
+    if(targetMode==='reveal' && file.type!=='image/png')throw new Error('Choose the original PNG containing the hidden message.');
     if(!['image/png','image/jpeg','image/webp'].includes(file.type))throw new Error('Choose a PNG, JPG, or WebP image.');
     if(file.size>20*1024*1024)throw new Error('Choose an image smaller than 20 MB.');
     const bitmap=await createImageBitmap(file);
+    if(revision !== picture.revision){bitmap.close();return;}
     if(bitmap.width*bitmap.height>16000000){bitmap.close();throw new Error('Choose an image with no more than 16 million pixels.');}
     const canvas=document.createElement('canvas');canvas.width=bitmap.width;canvas.height=bitmap.height;
     const ctx=canvas.getContext('2d',{willReadFrequently:true});
     // Flatten transparency so PNG encoding cannot discard hidden RGB bits.
     ctx.fillStyle='#ffffff';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.drawImage(bitmap,0,0);bitmap.close();
-    cover={canvas,ctx,data:ctx.getImageData(0,0,canvas.width,canvas.height)};
-    if(previewUrl)URL.revokeObjectURL(previewUrl);previewUrl=URL.createObjectURL(file);
-    $('preview').src=previewUrl;$('preview').hidden=false;$('upload-content').hidden=true;
-    $('image-info').textContent=`${file.name} · ${canvas.width} × ${canvas.height} · ${capacity(cover.data.data).toLocaleString()} bytes available`;
-  }catch(error){cover=null;$('preview').hidden=true;$('upload-content').hidden=false;$('image-info').textContent='Your image stays on your device.';$('status').textContent=error.message;}
+    picture.cover={canvas,ctx,data:ctx.getImageData(0,0,canvas.width,canvas.height)};
+    if(picture.previewUrl)URL.revokeObjectURL(picture.previewUrl);
+    picture.previewUrl=URL.createObjectURL(file);
+    picture.info=`${file.name} · ${canvas.width} × ${canvas.height} · ${capacity(picture.cover.data.data).toLocaleString()} bytes available`;
+    if(mode===targetMode)renderPicture();
+  }catch(error){
+    if(revision !== picture.revision)return;
+    if(picture.previewUrl)URL.revokeObjectURL(picture.previewUrl);
+    picture.cover=null;picture.previewUrl=null;picture.info='';
+    if(mode===targetMode){renderPicture();$('status').textContent=error.message;}
+  }
 }
 $('file').onchange=e=>load(e.target.files[0]);
 $('dropzone').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('file').click();}};
