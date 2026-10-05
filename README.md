@@ -24,6 +24,10 @@ npm run build
 
 Deploy `dist/` to any HTTPS static host.
 
+## Languages
+
+Choose English or **کوردی — بادینی** (Badini Kurdish, Arabic script) from the header. Kurdish uses a right-to-left layout; the language choice is remembered locally. Switching languages preserves current uploads, messages, passwords, and results. Translations are maintained in `src/i18n.js`.
+
 ## Use
 
 Choose **Hide a message**, upload PNG/JPEG/WebP, enter text and a password, and download the resulting PNG. The app verifies the actual exported PNG can be decrypted before offering the download. Choose **Reveal a message**, upload the original output PNG, and enter its password to recover the text.
