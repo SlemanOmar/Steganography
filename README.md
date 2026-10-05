@@ -2,6 +2,10 @@
 
 A browser-only app that encrypts text with AES-256-GCM and hides it in an image's RGB least significant bits. Files, messages, and passwords stay on the device; no backend or external requests are needed.
 
+## Start on Windows
+
+Install Node.js LTS from https://nodejs.org/, then double-click `start.bat` in the project folder. It installs dependencies on first launch and opens the app in your browser. Keep the terminal window open while using the app; press Ctrl+C to stop it.
+
 ## Develop
 
 Requires Node.js 20.19+ or 22.12+ (tested with Node 24).
