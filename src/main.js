@@ -6,7 +6,7 @@ app.innerHTML = `
 <header><a class="brand" href="./"><span class="brand-icon">◈</span> veil<span class="brand-dot">.</span></a><span class="privacy"><i></i> Private by design</span></header>
 <main><div class="eyebrow">A LITTLE SECRET. A BIG PICTURE.</div><h1>More than meets<br>the <em>eye.</em></h1><p class="intro">Hide a message inside a picture. Lock it with a password.<br>Keep your words between you and the person who matters.</p>
 <section class="workspace"><div class="tabs" role="tablist" aria-label="Choose operation"><button id="hide-tab" role="tab" aria-selected="true">↗ &nbsp; Hide a message</button><button id="reveal-tab" role="tab" aria-selected="false">↙ &nbsp; Reveal a message</button></div>
-<form id="form"><div class="columns"><div class="picture-column"><div class="section-label"><span>01 / YOUR PICTURE</span><span id="file-type">PNG · JPG · WEBP</span></div><label class="dropzone" id="dropzone" tabindex="0"><input id="file" type="file" accept="image/png,image/jpeg,image/webp"><div id="upload-content"><div class="upload-icon">▧<span>+</span></div><strong>Every picture has a secret.</strong><p>Drop yours here, or <u>browse files</u></p><small>Up to 20 MB · Exported as PNG</small></div><img id="preview" alt="Selected cover image" hidden></label><div id="image-info">Your image stays on your device.</div></div>
+<form id="form"><div class="columns"><div class="picture-column"><div class="section-label"><span>01 / YOUR PICTURE</span><span id="file-type">PNG · JPG · WEBP</span></div><div class="picture-upload"><label class="dropzone" id="dropzone" tabindex="0"><input id="file" type="file" accept="image/png,image/jpeg,image/webp"><div id="upload-content"><div class="upload-icon">▧<span>+</span></div><strong>Every picture has a secret.</strong><p>Drop yours here, or <u>browse files</u></p><small>Up to 20 MB · Exported as PNG</small></div><img id="preview" alt="Selected cover image" hidden></label><button id="remove-picture" class="remove-picture" type="button" aria-label="Remove picture" title="Remove picture" hidden>×</button></div><div id="image-info">Your image stays on your device.</div></div>
 <div class="message-column"><div class="section-label"><span id="step-two">02 / YOUR MESSAGE</span><span id="count">0 bytes</span></div><textarea id="message" placeholder="Something only they should know…" aria-label="Secret message" maxlength="1000000"></textarea><div class="password-label"><label for="password">03 / YOUR PASSWORD</label><button type="button" id="toggle-password">Show</button></div><input id="password" type="password" placeholder="Make it a good one" autocomplete="new-password" required><p class="password-help" id="password-help">This password unlocks the message. Share it separately.</p><button class="primary" id="submit" type="submit">Encrypt & hide <span>↗</span></button></div></div>
 <div class="status" id="status" role="status" aria-live="polite"></div><div id="result" hidden><a id="download" download="veil-secret.png">Download your picture ↗</a><label id="revealed-label" for="revealed" hidden>Decrypted message</label><textarea id="revealed" readonly hidden></textarea></div>
 </form><div class="card-footer"><span>⌁ &nbsp; AES-256-GCM encryption</span><span>⌂ &nbsp; 100% in your browser</span><span>◎ &nbsp; No uploads. No accounts.</span></div></section>
@@ -19,6 +19,7 @@ function renderPicture(){
   cover = picture.cover;
   $('file').value = '';
   $('preview').hidden = !cover;
+  $('remove-picture').hidden = !cover;
   $('upload-content').hidden = !!cover;
   if (picture.previewUrl) $('preview').src = picture.previewUrl;
   else $('preview').removeAttribute('src');
@@ -66,6 +67,15 @@ async function load(file){
     if(mode===targetMode){renderPicture();$('status').textContent=error.message;}
   }
 }
+$('remove-picture').onclick=()=>{
+  if(busy)return;
+  const picture=pictures[mode];
+  picture.revision++;
+  if(picture.previewUrl)URL.revokeObjectURL(picture.previewUrl);
+  picture.cover=null;picture.previewUrl=null;picture.info='';
+  clearResult();renderPicture();
+  $('dropzone').focus();
+};
 $('file').onchange=e=>load(e.target.files[0]);
 $('dropzone').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('file').click();}};
 $('dropzone').ondragover=e=>{e.preventDefault();$('dropzone').classList.add('dragging');};
@@ -76,7 +86,7 @@ $('form').onsubmit=async e=>{
   if(!crypto.subtle){$('status').textContent='Open this app over HTTPS or localhost to use encryption.';return;}
   if(!cover){$('status').textContent='Choose a picture first.';return;}
   if(mode==='hide'&&!$('message').value.trim()){$('status').textContent='Enter a message to hide.';return;}
-  busy=true;$('submit').disabled=true;$('status').textContent=mode==='hide'?'Encrypting and verifying your picture…':'Decrypting your message…';
+  busy=true;$('submit').disabled=true;$('remove-picture').disabled=true;$('status').textContent=mode==='hide'?'Encrypting and verifying your picture…':'Decrypting your message…';
   try{
     if(mode==='hide'){
       const text=$('message').value;
@@ -94,5 +104,5 @@ $('form').onsubmit=async e=>{
       const text=await open(extract(cover.data.data),$('password').value);
       $('revealed').value=text;$('revealed').hidden=false;$('revealed-label').hidden=false;$('download').hidden=true;$('result').hidden=false;$('status').textContent='Message unlocked.';
     }
-  }catch(error){$('status').textContent=error.message;}finally{busy=false;$('submit').disabled=false;}
+  }catch(error){$('status').textContent=error.message;}finally{busy=false;$('submit').disabled=false;$('remove-picture').disabled=false;}
 };
