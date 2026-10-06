@@ -41,7 +41,15 @@ npm test
 npm run build
 ```
 
-Deploy `dist/` to any HTTPS static host.
+## Publish with GitHub Pages
+
+The workflow in `.github/workflows/pages.yml` tests, builds, and deploys the site on pushes to `main`.
+
+In the repository's **Settings → Pages**, set **Build and deployment → Source** to **GitHub Actions**. Then open **Actions → Deploy Wéne Cipher to GitHub Pages → Run workflow** if a deployment has not already started.
+
+After the deployment succeeds, the site will be available at https://slemanomar.github.io/Steganography/. The workflow sets the asset base path to `/Steganography/`, including bundled Kurdish fonts. No backend or secrets are required.
+
+For another HTTPS static host, run `npm run build` and publish `dist/`. Set `VITE_BASE_PATH` when hosting under a subdirectory.
 
 ## Update your local copy
 
