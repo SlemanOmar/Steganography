@@ -1,5 +1,7 @@
 const badini = {
   'Your image stays on your device.': 'وێنەیا تە ل سەر ئامیرێ تە دمینیت.',
+  'Could not read this image. Choose a valid PNG, JPG, or WebP file.': 'ئەڤ وێنەیە نەهاتە خوێندن. فایلەکا دروست یا PNG، JPG یان WebP هەلبژێرە.',
+  'Choose picture': 'وێنەیەکێ هەلبژێرە',
   'Show': 'نیشان بدە', 'Hide': 'ڤەشێرە',
   '02 / YOUR MESSAGE': '02 / پەیاما تە', '02 / UNLOCK THE MESSAGE': '02 / پەیامێ ڤەکە',
   'ORIGINAL PNG': 'PNG یا ڕەسەن',
@@ -7,7 +9,7 @@ const badini = {
   'Enter the password used to hide the message.': 'وێ پەیڤا نهێنی بنڤیسە یا بۆ ڤەشارتنا پەیامێ هاتیە بکارئینان.',
   'Choose the original PNG containing the hidden message.': 'وێنەیا PNG یا ڕەسەن هەلبژێرە یا پەیاما ڤەشارتی تێدا هەی.',
   'Choose a PNG, JPG, or WebP image.': 'وێنەیەکا PNG، JPG یان WebP هەلبژێرە.',
-  'Choose an image smaller than 20 MB.': 'وێنەیەکێ بچووکتر ژ 20 MB هەلبژێرە.',
+  'Choose an image smaller than 64 MB.': 'وێنەیەکێ بچووکتر ژ 64 MB هەلبژێرە.',
   'Choose an image with no more than 16 million pixels.': 'وێنەیەکێ هەلبژێرە کو ژ 16 ملیۆن پیکسەلان زێدە نەبیت.',
   'Open this app over HTTPS or localhost to use encryption.': 'بۆ ڕەمزکرنێ، ئەڤ بەرنامەی ل سەر HTTPS یان localhost ڤەکە.',
   'Choose a picture first.': 'بەری هەمی تشتی وێنەیەکێ هەلبژێرە.',
@@ -34,7 +36,7 @@ const staticText = [
   ['.picture-column .section-label span:first-child', '01 / YOUR PICTURE', '01 / وێنەیا تە'],
   ['#upload-content strong', 'Every picture has a secret.', 'هەر وێنەیەک نهێنیەک هەیە.'],
   ['#upload-content p', 'Drop yours here, or <u>browse files</u>', 'وێنەیا خۆ ل ڤێرە دابنێ، یان <u>فایلەکێ هەلبژێرە</u>'],
-  ['#upload-content small', 'Up to 20 MB · Exported as PNG', 'هەتا 20 MB · دەرئەنجام ب PNG'],
+  ['#upload-content small', 'Up to 64 MB · Exported as PNG', 'هەتا 64 MB · دەرئەنجام ب PNG'],
   ['label[for="password"]', '03 / YOUR PASSWORD', '03 / پەیڤا نهێنی یا تە'],
   ['#download', 'Download your picture ↗', 'وێنەیا خۆ دابگرە ↗'],
   ['#revealed-label', 'Decrypted message', 'پەیاما ڤەکری'],
@@ -54,10 +56,10 @@ export function byteCount(bytes){return `${bytes.toLocaleString()} ${language===
 export function applyLanguage(next=language){
   language=next;
   try{localStorage.setItem('veil-language',language);}catch{}
-  document.documentElement.lang=language==='bad'?'ku-Arab':'en';
+  document.documentElement.lang=language==='bad'?'kmr-Arab':'en';
   document.documentElement.dir=language==='bad'?'rtl':'ltr';
   for(const [selector,en,bad] of staticText)document.querySelector(selector).innerHTML=language==='bad'?bad:en;
-  const attrs=[['#message','placeholder','Something only they should know…','تشتەک کو بتنێ ئەو دڤێت بزانیت…'],['#message','aria-label','Secret message','پەیاما نهێنی'],['#password','placeholder','Make it a good one','پەیڤەکا نهێنی یا بەهێز بنڤیسە'],['#preview','alt','Selected cover image','وێنەیا هەلبژارتی'],['#remove-picture','aria-label','Remove picture','وێنەیێ ژێ ببە'],['#remove-picture','title','Remove picture','وێنەیێ ژێ ببە'],['.tabs','aria-label','Choose operation','کریارەکێ هەلبژێرە']];
+  const attrs=[['#file','aria-label','Choose picture','وێنەیەکێ هەلبژێرە'],['#message','placeholder','Something only they should know…','تشتەک کو بتنێ ئەو دڤێت بزانیت…'],['#message','aria-label','Secret message','پەیاما نهێنی'],['#password','placeholder','Make it a good one','پەیڤەکا نهێنی یا بەهێز بنڤیسە'],['#preview','alt','Selected cover image','وێنەیا هەلبژارتی'],['#remove-picture','aria-label','Remove picture','وێنەیێ ژێ ببە'],['#remove-picture','title','Remove picture','وێنەیێ ژێ ببە'],['.tabs','aria-label','Choose operation','کریارەکێ هەلبژێرە']];
   for(const [selector,attr,en,bad] of attrs)document.querySelector(selector).setAttribute(attr,language==='bad'?bad:en);
   document.querySelector('#language').value=language;
 }

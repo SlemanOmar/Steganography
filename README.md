@@ -16,10 +16,10 @@ Install Node.js LTS from https://nodejs.org/, then double-click `start.bat` in t
 
 ## Develop
 
-Requires Node.js 20.19+ or 22.12+ (tested with Node 24).
+Requires Node.js 20.19+, 22.12+, or 24+ (tested with Node 24).
 
 ```sh
-npm ci --cache /workspace/.npm-cache
+npm ci
 npm run dev
 ```
 
@@ -40,7 +40,7 @@ Choose English or **کوردی — بادینی** (Badini Kurdish, Arabic script
 
 Choose **Hide a message**, upload PNG/JPEG/WebP, enter text and a password, and download the resulting PNG. The app verifies the actual exported PNG can be decrypted before offering the download. Choose **Reveal a message**, upload the original output PNG, and enter its password to recover the text.
 
-Only images are supported in this version. Images are limited to 20 MB and 16 million pixels. Transparency is flattened onto white before embedding. Preserve the output PNG: resizing, lossy compression, image editing, or social-media processing can erase the payload. Encryption does not make the presence of hidden data undetectable.
+Only images are supported in this version. Images are limited to 64 MB and 16 million pixels. Transparency is flattened onto white before embedding. Preserve the output PNG: resizing, lossy compression, image editing, or social-media processing can erase the payload. Encryption does not make the presence of hidden data undetectable.
 
 ## Encryption format
 
@@ -50,4 +50,4 @@ Version 1 payload: `VEIL` + version byte, four-byte big-endian ciphertext length
 
 ## Validation
 
-`npm test` covers Unicode round trips, alpha preservation, wrong passwords, tampering, invalid headers, oversized payloads, and fresh salts/nonces. Browser smoke validation also exercised PNG encoding/download/re-upload, decryption, wrong-password errors, and mobile overflow checks.
+`npm test` covers Unicode round trips, alpha preservation, wrong passwords, tampering, invalid headers, truncated or appended packets, exact capacity boundaries, oversized payloads, and fresh salts/nonces. Browser smoke validation also exercised PNG encoding/download/re-upload, decryption, wrong-password errors, and mobile overflow checks.

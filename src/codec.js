@@ -40,7 +40,9 @@ export function extract(pixels) {
   return read(37+length);
 }
 export async function open(packet, password) {
+  if (!password) throw new Error('Enter a password.');
   try {
+    if (packet.length < 53 || !MAGIC.every((byte,i)=>packet[i]===byte) || new DataView(packet.buffer,packet.byteOffset,packet.byteLength).getUint32(5)!==packet.length-37) throw new Error('Invalid packet');
     const decrypted = await crypto.subtle.decrypt({name:'AES-GCM',iv:packet.slice(25,37),additionalData:MAGIC}, await key(password, packet.slice(9,25)), packet.slice(37));
     return new TextDecoder('utf-8',{fatal:true}).decode(decrypted);
   } catch { throw new Error('Could not decrypt. The password is incorrect or the image has been modified.'); }

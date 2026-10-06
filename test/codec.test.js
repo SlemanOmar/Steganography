@@ -23,3 +23,19 @@ test('missing messages, invalid lengths and oversized payloads are rejected',()=
 test('fresh encryptions use different salts and nonces',async()=>{
  assert.notDeepEqual(await seal('same','password'),await seal('same','password'));
 });
+test('packet validation rejects missing passwords, altered signatures and appended data',async()=>{
+ const packet=await seal('private','password');
+ await assert.rejects(seal('private',''),/Enter a password/);
+ await assert.rejects(open(packet,''),/Enter a password/);
+ const badSignature=packet.slice();badSignature[0]^=1;
+ await assert.rejects(open(badSignature,'password'),/Could not decrypt/);
+ const appended=new Uint8Array(packet.length+1);appended.set(packet);
+ await assert.rejects(open(appended,'password'),/Could not decrypt/);
+ await assert.rejects(open(packet.slice(0,20),'password'),/Could not decrypt/);
+});
+test('exact image capacity accepts full payload and rejects one extra UTF-8 byte',async()=>{
+ const pixels=new Uint8ClampedArray(16*16*4).fill(255);
+ const message='a'.repeat(capacity(pixels));
+ assert.equal(await open(extract(embed(pixels,await seal(message,'password'))),'password'),message);
+ assert.throws(()=>embed(pixels,new Uint8Array(54+message.length)),/too large/);
+});
