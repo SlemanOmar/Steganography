@@ -1,4 +1,4 @@
-# Veil — encrypted image steganography
+# Wéne Cipher — encrypted image steganography
 
 A browser-only app that encrypts text with AES-256-GCM and hides it in an image's RGB least significant bits. Files, messages, and passwords stay on the device; no backend or external requests are needed.
 

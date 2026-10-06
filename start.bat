@@ -1,4 +1,5 @@
 @echo off
+chcp 65001 >nul
 setlocal
 pushd "%~dp0"
 if errorlevel 1 goto directory_error
@@ -17,17 +18,17 @@ call npm ci --no-audit --no-fund
 if errorlevel 1 goto install_error
 
 :start_app
-echo Starting Veil. Your browser will open automatically.
+echo Starting Wéne Cipher. Your browser will open automatically.
 echo Keep this window open. Press Ctrl+C to stop the app.
 call npm run dev -- --host 127.0.0.1 --open
-set "veil_exit_code=%errorlevel%"
-if not "%veil_exit_code%"=="0" (
+set "wene_exit_code=%errorlevel%"
+if not "%wene_exit_code%"=="0" (
     echo.
     echo The server stopped with an error. See the message above.
     pause
 )
 popd
-exit /b %veil_exit_code%
+exit /b %wene_exit_code%
 
 :missing_node
 echo Node.js and npm are required. Install Node.js LTS from https://nodejs.org/
