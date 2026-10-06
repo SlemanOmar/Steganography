@@ -1,6 +1,14 @@
 # Wéne Cipher — encrypted image steganography
 
-A browser-only app that encrypts text with AES-256-GCM and hides it in an image's RGB least significant bits. Files, messages, and passwords stay on the device; no backend or external requests are needed.
+Wéne Cipher is a browser-based web application that combines AES-256-GCM encryption with Least Significant Bit (LSB) steganography to hide and recover text inside images. All processing happens locally: images, messages, and passwords stay on the user's device.
+
+- Password-based key derivation with PBKDF2-HMAC-SHA-256 and a fresh salt and nonce for each message.
+- PNG export with automatic extraction and decryption verification before download.
+- Responsive navy blue and cream interface with English and Badini Kurdish support, including right-to-left layouts.
+
+**Technologies:** JavaScript, HTML, CSS, Web Crypto API, Canvas API, Vite, Git.
+
+**Designed and developed by Mr. Suleman Omar.**
 
 ## Start on Windows
 
