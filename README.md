@@ -15,8 +15,8 @@ Wéne Cipher is a browser-based web application that combines AES-256-GCM encryp
 Install [Node.js 24 LTS](https://nodejs.org/) and [Git](https://git-scm.com/downloads), then run:
 
 ```sh
-git clone https://github.com/SlemanOmar/Steganography.git
-cd Steganography
+git clone https://github.com/SlemanOmar/WeneCipher.git
+cd WeneCipher
 ```
 
 Alternatively, select **Code → Download ZIP** on GitHub and extract the archive. Git updates require a cloned checkout.
@@ -47,7 +47,7 @@ The workflow in `.github/workflows/pages.yml` tests, builds, and deploys the sit
 
 In the repository's **Settings → Pages**, set **Build and deployment → Source** to **GitHub Actions**. Then open **Actions → Deploy Wéne Cipher to GitHub Pages → Run workflow** if a deployment has not already started.
 
-After the deployment succeeds, the site will be available at https://slemanomar.github.io/Steganography/. The workflow sets the asset base path to `/Steganography/`, including bundled Kurdish fonts. No backend or secrets are required.
+After the deployment succeeds, the site will be available at https://slemanomar.github.io/WeneCipher/. The workflow sets the asset base path to `/WeneCipher/`, including bundled Kurdish fonts. No backend or secrets are required.
 
 For another HTTPS static host, run `npm run build` and publish `dist/`. Set `VITE_BASE_PATH` when hosting under a subdirectory.
 
